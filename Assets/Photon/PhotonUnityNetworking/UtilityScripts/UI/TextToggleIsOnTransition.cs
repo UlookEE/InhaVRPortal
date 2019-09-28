@@ -7,28 +7,45 @@
 // <author>developer@exitgames.com</author>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 using UnityEngine;  
-using System.Collections;  
-using UnityEngine.EventSystems;  
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace ExitGames.UtilityScripts
+namespace Photon.Pun.UtilityScripts
 {
 
 	/// <summary>
-	/// Use this on toggles texts to have some color transition on the text depending on the isOnState.
+	/// Use this on toggles texts to have some color transition on the text depending on the isOn State.
 	/// </summary>
 	[RequireComponent(typeof(Text))]
-	public class TextToggleIsOnTransition : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler  {
+	public class TextToggleIsOnTransition : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    {
 
+        /// <summary>
+        /// The toggle Component.
+        /// </summary>
 		public Toggle toggle;
 
 		Text _text;
 
+        /// <summary>
+        /// The color of the normal on transition state.
+        /// </summary>
 		public Color NormalOnColor= Color.white;
+
+        /// <summary>
+        /// The color of the normal off transition state.
+        /// </summary>
 		public Color NormalOffColor = Color.black;
+
+        /// <summary>
+        /// The color of the hover on transition state.
+        /// </summary>
 		public Color HoverOnColor= Color.black;
+
+        /// <summary>
+        /// The color of the hover off transition state.
+        /// </summary>
 		public Color HoverOffColor = Color.black;
 
 		bool isHover;
@@ -37,7 +54,10 @@ namespace ExitGames.UtilityScripts
 		{
 			_text = GetComponent<Text>();
 		
+			OnValueChanged (toggle.isOn);
+
 			toggle.onValueChanged.AddListener(OnValueChanged);
+
 		}
 
 		public void OnDisable()
@@ -47,9 +67,7 @@ namespace ExitGames.UtilityScripts
 
 		public void OnValueChanged(bool isOn)
 		{
-
-				_text.color = isOn? (isHover?HoverOnColor:HoverOffColor) : (isHover?NormalOnColor:NormalOffColor) ;
-
+				_text.color = isOn? (isHover?HoverOnColor:HoverOnColor) : (isHover?NormalOffColor:NormalOffColor) ;
 		}
 
 		public void OnPointerEnter(PointerEventData eventData)

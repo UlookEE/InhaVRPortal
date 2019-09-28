@@ -1,11 +1,24 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="OnStartDelete.cs" company="Exit Games GmbH">
+//   Part of: Photon Unity Utilities, 
+// </copyright>
+// <summary>
+//  This component will destroy the GameObject it is attached to (in Start()).
+// </summary>
+// <author>developer@exitgames.com</author>
+// --------------------------------------------------------------------------------------------------------------------
+
 using UnityEngine;
 
-/// <summary>This component will destroy the GameObject it is attached to (in Start()).</summary>
-public class OnStartDelete : MonoBehaviour 
+namespace Photon.Pun.UtilityScripts
 {
-	// Use this for initialization
-	void Start()
+    /// <summary>This component will destroy the GameObject it is attached to (in Start()).</summary>
+    public class OnStartDelete : MonoBehaviour
     {
-		Destroy(this.gameObject);
-	}
+        // Use this for initialization
+        private void Start()
+        {
+            Destroy(this.gameObject);
+        }
+    }
 }

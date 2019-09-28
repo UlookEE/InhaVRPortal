@@ -1,186 +1,97 @@
-#pragma warning disable 1587
-/// \file
-/// <summary>ScriptableObject defining a server setup. An instance is created as <b>PhotonServerSettings</b>.</summary>
-#pragma warning restore 1587
+// ----------------------------------------------------------------------------
+// <copyright file="ServerSettings.cs" company="Exit Games GmbH">
+//   PhotonNetwork Framework for Unity - Copyright (C) 2018 Exit Games GmbH
+// </copyright>
+// <summary>
+// ScriptableObject defining a server setup. An instance is created as <b>PhotonServerSettings</b>.
+// </summary>
+// <author>developer@exitgames.com</author>
+// ----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using ExitGames.Client.Photon;
-using UnityEngine;
 
-
-public class Region
+namespace Photon.Pun
 {
-    public CloudRegionCode Code;
-    /// <summary>Unlike the CloudRegionCode, this may contain cluster information.</summary>
-    public string Cluster;
-    public string HostAndPort;
-    public int Ping;
-
-    public Region(CloudRegionCode code)
-    {
-        this.Code = code;
-        this.Cluster = code.ToString();
-    }
-
-    public Region(CloudRegionCode code, string regionCodeString, string address)
-    {
-        this.Code = code;
-        this.Cluster = regionCodeString;
-        this.HostAndPort = address;
-    }
-
-    public static CloudRegionCode Parse(string codeAsString)
-    {
-        if (codeAsString == null)
-        {
-            return CloudRegionCode.none;
-        }
-
-        int slash = codeAsString.IndexOf('/');
-        if (slash > 0)
-        {
-            codeAsString = codeAsString.Substring(0, slash);
-        }
-        codeAsString = codeAsString.ToLower();
-
-        if (Enum.IsDefined(typeof(CloudRegionCode), codeAsString))
-        {
-            return (CloudRegionCode)Enum.Parse(typeof(CloudRegionCode), codeAsString);
-        }
-
-        return CloudRegionCode.none;
-    }
-
-
-    internal static CloudRegionFlag ParseFlag(CloudRegionCode region)
-    {
-        if (Enum.IsDefined(typeof(CloudRegionFlag), region.ToString()))
-        {
-            return (CloudRegionFlag)Enum.Parse(typeof(CloudRegionFlag), region.ToString());
-        }
-
-        return (CloudRegionFlag)0;
-    }
-
-    [Obsolete]
-    internal static CloudRegionFlag ParseFlag(string codeAsString)
-    {
-        codeAsString = codeAsString.ToLower();
-
-        CloudRegionFlag code = 0;
-        if (Enum.IsDefined(typeof(CloudRegionFlag), codeAsString))
-        {
-            code = (CloudRegionFlag)Enum.Parse(typeof(CloudRegionFlag), codeAsString);
-        }
-
-        return code;
-    }
-
-    public override string ToString()
-    {
-        return string.Format("'{0}' \t{1}ms \t{2}", this.Cluster, this.Ping, this.HostAndPort);
-    }
-}
-
-
-/// <summary>
-/// Collection of connection-relevant settings, used internally by PhotonNetwork.ConnectUsingSettings.
-/// </summary>
-[Serializable]
-public class ServerSettings : ScriptableObject
-{
-    public enum HostingOption { NotSet = 0, PhotonCloud = 1, SelfHosted = 2, OfflineMode = 3, BestRegion = 4 }
-
-    public string AppID = "";
-    public string VoiceAppID = "";
-    public string ChatAppID = "";
-
-    public HostingOption HostType = HostingOption.NotSet;
-
-    public CloudRegionCode PreferredRegion;
-    public CloudRegionFlag EnabledRegions = (CloudRegionFlag)(-1);
-
-    public ConnectionProtocol Protocol = ConnectionProtocol.Udp;
-    public string ServerAddress = "";
-    public int ServerPort = 5055;
-    public int VoiceServerPort = 5055;  // Voice only uses UDP
-
-
-    public bool JoinLobby;
-    public bool EnableLobbyStatistics;
-    public PhotonLogLevel PunLogging = PhotonLogLevel.ErrorsOnly;
-    public DebugLevel NetworkLogging = DebugLevel.ERROR;
-
-	public bool RunInBackground = true;
-
-    public List<string> RpcList = new List<string>();   // set by scripts and or via Inspector
-
-    [HideInInspector]
-    public bool DisableAutoOpenWizard;
-
-
-    public void UseCloudBestRegion(string cloudAppid)
-    {
-        this.HostType = HostingOption.BestRegion;
-        this.AppID = cloudAppid;
-    }
-
-    public void UseCloud(string cloudAppid)
-    {
-        this.HostType = HostingOption.PhotonCloud;
-        this.AppID = cloudAppid;
-    }
-
-    public void UseCloud(string cloudAppid, CloudRegionCode code)
-    {
-        this.HostType = HostingOption.PhotonCloud;
-        this.AppID = cloudAppid;
-        this.PreferredRegion = code;
-    }
-
-    public void UseMyServer(string serverAddress, int serverPort, string application)
-    {
-        this.HostType = HostingOption.SelfHosted;
-        this.AppID = (application != null) ? application : "master";
-
-        this.ServerAddress = serverAddress;
-        this.ServerPort = serverPort;
-    }
-
-    /// <summary>Checks if a string is a Guid by attempting to create one.</summary>
-    /// <param name="val">The potential guid to check.</param>
-    /// <returns>True if new Guid(val) did not fail.</returns>
-    public static bool IsAppId(string val)
-    {
-        try
-        {
-            new Guid(val);
-        }
-        catch
-        {
-            return false;
-        }
-        return true;
-    }
+    using System;
+    using System.Collections.Generic;
+    using ExitGames.Client.Photon;
+    using Photon.Realtime;
+    using UnityEngine;
 
     /// <summary>
-    /// Gets the best region code in preferences.
-    /// This composes the PhotonHandler, since its Internal and can not be accessed by the custom inspector
+    /// Collection of connection-relevant settings, used internally by PhotonNetwork.ConnectUsingSettings.
     /// </summary>
-    /// <value>The best region code in preferences.</value>
-    public static CloudRegionCode BestRegionCodeInPreferences
+    /// <remarks>
+    /// Includes the AppSettings class from the Realtime APIs plus some other, PUN-relevant, settings.</remarks>
+    [Serializable]
+    [HelpURL("https://doc.photonengine.com/en-us/pun/v2/getting-started/initial-setup")]
+    public class ServerSettings : ScriptableObject
     {
-        get { return PhotonHandler.BestRegionCodeInPreferences; }
-    }
+        [Tooltip("Core Photon Server/Cloud settings.")]
+        public AppSettings AppSettings;
 
-    public static void ResetBestRegionCodeInPreferences()
-	{
-		PhotonHandler.BestRegionCodeInPreferences = CloudRegionCode.none;
-	}
+        [Tooltip("Log output by PUN.")]
+        public PunLogLevel PunLogging = PunLogLevel.ErrorsOnly;
 
-    public override string ToString()
-    {
-        return "ServerSettings: " + HostType + " " + ServerAddress;
+        [Tooltip("Logs additional info for debugging.")]
+        public bool EnableSupportLogger;
+
+        [Tooltip("Enables apps to keep the connection without focus.")]
+        public bool RunInBackground = true;
+
+        [Tooltip("Simulates an online connection.\nPUN can be used as usual.")]
+        public bool StartInOfflineMode;
+
+        [Tooltip("RPC name list.\nUsed as shortcut when sending calls.")]
+        public List<string> RpcList = new List<string>();   // set by scripts and or via Inspector
+
+        #if UNITY_EDITOR
+        [HideInInspector]
+        public bool DisableAutoOpenWizard;
+        [HideInInspector]
+        public bool ShowSettings;
+        #endif
+
+        /// <summary>Sets appid and region code in the AppSettings. Used in Editor.</summary>
+        public void UseCloud(string cloudAppid, string code = "")
+        {
+            this.AppSettings.AppIdRealtime = cloudAppid;
+            this.AppSettings.Server = null;
+            this.AppSettings.FixedRegion = string.IsNullOrEmpty(code) ? null : code;
+        }
+
+        /// <summary>Checks if a string is a Guid by attempting to create one.</summary>
+        /// <param name="val">The potential guid to check.</param>
+        /// <returns>True if new Guid(val) did not fail.</returns>
+        public static bool IsAppId(string val)
+        {
+            try
+            {
+                new Guid(val);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>Gets the "best region summary" from the preferences.</summary>
+        /// <value>The best region code in preferences.</value>
+        public static string BestRegionSummaryInPreferences
+        {
+            get { return PhotonNetwork.BestRegionSummaryInPreferences; }
+        }
+
+        /// <summary>Sets the "best region summary" in the preferences to null. On next start, the client will ping all available.</summary>
+        public static void ResetBestRegionCodeInPreferences()
+        {
+            PhotonNetwork.BestRegionSummaryInPreferences = null;
+        }
+
+        /// <summary>String summary of the AppSettings.</summary>
+        public override string ToString()
+        {
+            return "ServerSettings: " + this.AppSettings.ToStringFull();
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿// ----------------------------------------------------------------------------
 // <copyright file="PhotonRigidbody2DView.cs" company="Exit Games GmbH">
-//   PhotonNetwork Framework for Unity - Copyright (C) 2016 Exit Games GmbH
+//   PhotonNetwork Framework for Unity - Copyright (C) 2018 Exit Games GmbH
 // </copyright>
 // <summary>
 //   Component to synchronize 2d rigidbodies via PUN.
@@ -8,60 +8,103 @@
 // <author>developer@exitgames.com</author>
 // ----------------------------------------------------------------------------
 
-using UnityEngine;
 
-/// <summary>
-/// This class helps you to synchronize the velocities of a 2d physics RigidBody.
-/// Note that only the velocities are synchronized and because Unitys physics
-/// engine is not deterministic (ie. the results aren't always the same on all
-/// computers) - the actual positions of the objects may go out of sync. If you
-/// want to have the position of this object the same on all clients, you should
-/// also add a PhotonTransformView to synchronize the position.
-/// Simply add the component to your GameObject and make sure that
-/// the PhotonRigidbody2DView is added to the list of observed components
-/// </summary>
-[RequireComponent(typeof(PhotonView))]
-[RequireComponent(typeof(Rigidbody2D))]
-[AddComponentMenu("Photon Networking/Photon Rigidbody 2D View")]
-public class PhotonRigidbody2DView : MonoBehaviour, IPunObservable
+namespace Photon.Pun
 {
-    [SerializeField]
-    bool m_SynchronizeVelocity = true;
+    using UnityEngine;
 
-    [SerializeField]
-    bool m_SynchronizeAngularVelocity = true;
 
-    Rigidbody2D m_Body;
-
-    void Awake()
+    [RequireComponent(typeof(PhotonView))]
+    [RequireComponent(typeof(Rigidbody2D))]
+    [AddComponentMenu("Photon Networking/Photon Rigidbody 2D View")]
+    public class PhotonRigidbody2DView : MonoBehaviour, IPunObservable
     {
-        this.m_Body = GetComponent<Rigidbody2D>();
-    }
+        private float m_Distance;
+        private float m_Angle;
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.isWriting == true)
+        private Rigidbody2D m_Body;
+
+        private PhotonView m_PhotonView;
+
+        private Vector2 m_NetworkPosition;
+
+        private float m_NetworkRotation;
+
+        public bool m_SynchronizeVelocity = true;
+        public bool m_SynchronizeAngularVelocity = false;
+
+        public bool m_TeleportEnabled = false;
+        public float m_TeleportIfDistanceGreaterThan = 3.0f;
+
+        public void Awake()
         {
-            if (this.m_SynchronizeVelocity == true)
-            {
-                stream.SendNext(this.m_Body.velocity);
-            }
+            this.m_Body = GetComponent<Rigidbody2D>();
+            this.m_PhotonView = GetComponent<PhotonView>();
 
-            if (this.m_SynchronizeAngularVelocity == true)
+            this.m_NetworkPosition = new Vector2();
+        }
+
+        public void FixedUpdate()
+        {
+            if (!this.m_PhotonView.IsMine)
             {
-                stream.SendNext(this.m_Body.angularVelocity);
+                this.m_Body.position = Vector2.MoveTowards(this.m_Body.position, this.m_NetworkPosition, this.m_Distance * (1.0f / PhotonNetwork.SerializationRate));
+                this.m_Body.rotation = Mathf.MoveTowards(this.m_Body.rotation, this.m_NetworkRotation, this.m_Angle * (1.0f / PhotonNetwork.SerializationRate));
             }
         }
-        else
-        {
-            if (this.m_SynchronizeVelocity == true)
-            {
-                this.m_Body.velocity = (Vector2)stream.ReceiveNext();
-            }
 
-            if (this.m_SynchronizeAngularVelocity == true)
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
             {
-                this.m_Body.angularVelocity = (float)stream.ReceiveNext();
+                stream.SendNext(this.m_Body.position);
+                stream.SendNext(this.m_Body.rotation);
+
+                if (this.m_SynchronizeVelocity)
+                {
+                    stream.SendNext(this.m_Body.velocity);
+                }
+
+                if (this.m_SynchronizeAngularVelocity)
+                {
+                    stream.SendNext(this.m_Body.angularVelocity);
+                }
+            }
+            else
+            {
+                this.m_NetworkPosition = (Vector2)stream.ReceiveNext();
+                this.m_NetworkRotation = (float)stream.ReceiveNext();
+
+                if (this.m_TeleportEnabled)
+                {
+                    if (Vector3.Distance(this.m_Body.position, this.m_NetworkPosition) > this.m_TeleportIfDistanceGreaterThan)
+                    {
+                        this.m_Body.position = this.m_NetworkPosition;
+                    }
+                }
+
+                if (this.m_SynchronizeVelocity || this.m_SynchronizeAngularVelocity)
+                {
+                    float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+
+                    if (m_SynchronizeVelocity)
+                    {
+                        this.m_Body.velocity = (Vector2)stream.ReceiveNext();
+
+                        this.m_NetworkPosition += this.m_Body.velocity * lag;
+
+                        this.m_Distance = Vector2.Distance(this.m_Body.position, this.m_NetworkPosition);
+                    }
+
+                    if (this.m_SynchronizeAngularVelocity)
+                    {
+                        this.m_Body.angularVelocity = (float)stream.ReceiveNext();
+
+                        this.m_NetworkRotation += this.m_Body.angularVelocity * lag;
+
+                        this.m_Angle = Mathf.Abs(this.m_Body.rotation - this.m_NetworkRotation);
+                    }
+                }
             }
         }
     }

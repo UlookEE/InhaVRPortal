@@ -14,10 +14,11 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
-namespace ExitGames.Client.Photon
+namespace Photon.Pun
 {
-   /// <summary>
+    /// <summary>
     /// Creates a instance of the Account Service to register Photon Cloud accounts.
     /// </summary>
     public class AccountService
@@ -52,6 +53,7 @@ namespace ExitGames.Client.Photon
             AccountServiceRequest req = new AccountServiceRequest();
             req.Email = email;
             req.ServiceTypes = serviceTypes;
+            //Debug.LogWarningFormat("Service types sent {0}", serviceTypes);
             return this.RegisterByEmail(req, callback, errorCallback);
         }
 
@@ -72,12 +74,15 @@ namespace ExitGames.Client.Photon
                 Debug.LogError("Registration request is null");
                 return false;
             }
+            string fullUrl = GetUrlWithQueryStringEscaped(request);
+            //Debug.LogWarningFormat("Full URL {0}", fullUrl);
             PhotonEditorUtils.StartCoroutine(
-                PhotonEditorUtils.HttpPost(GetUrlWithQueryStringEscaped(request),
+                PhotonEditorUtils.HttpPost(fullUrl,
                     RequestHeaders,
                     null,
                     s =>
                     {
+                        //Debug.LogWarningFormat("received response {0}", s);
                         if (string.IsNullOrEmpty(s))
                         {
                             if (errorCallback != null)
@@ -114,13 +119,8 @@ namespace ExitGames.Client.Photon
 
         private static string GetUrlWithQueryStringEscaped(AccountServiceRequest request)
         {
-            #if UNITY_2017_3_OR_NEWER
             string email = UnityEngine.Networking.UnityWebRequest.EscapeURL(request.Email);
             string st = UnityEngine.Networking.UnityWebRequest.EscapeURL(request.ServiceTypes);
-            #else
-            string email = WWW.EscapeURL(request.Email);
-            string st = WWW.EscapeURL(request.ServiceTypes);
-            #endif
             return string.Format("{0}?email={1}&st={2}", ServiceUrl, email, st);
         }
 
@@ -147,6 +147,11 @@ namespace ExitGames.Client.Photon
                         {
                             res.ApplicationIds.Add(parts[i], parts[i + 1]);
                         }
+                    }
+                    else
+                    {
+                        Debug.LogError("The server did not return any AppId, ApplicationIds was empty in the response.");
+                        return null;
                     }
                 }
                 return res;
@@ -177,22 +182,21 @@ namespace ExitGames.Client.Photon
             return null;
         }
 
-        // https://stackoverflow.com/a/1374644/1449056
+        //https://github.com/rhyous/EmailRegEx
+        public static string ComplexEmailPattern = @"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*" // local-part
+                                                    + "@"
+                                                    + @"((([\w]+([-\w]*[\w]+)*\.)+[a-zA-Z]+)|" // domain
+                                                    + @"((([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]).){3}[01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))\z"; // or IP Address
+
         public static bool IsValidEmail(string email)
         {
             if (string.IsNullOrEmpty(email) || !email.Contains("@"))
             {
                 return false;
             }
-            try
-            {
-                System.Net.Mail.MailAddress addr = new System.Net.Mail.MailAddress(email);
-                return email.Equals(addr.Address, StringComparison.OrdinalIgnoreCase);
-            }
-            catch
-            {
-                return false;
-            }
+            return Regex.IsMatch(email, ComplexEmailPattern,
+                RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase |
+                RegexOptions.Singleline);
         }
     }
 

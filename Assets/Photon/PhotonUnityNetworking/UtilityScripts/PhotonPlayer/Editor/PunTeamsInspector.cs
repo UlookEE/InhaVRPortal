@@ -14,7 +14,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 
-namespace ExitGames.UtilityScripts
+using Photon.Pun;
+using Photon.Realtime;
+
+namespace Photon.Pun.UtilityScripts
 {
 	[CustomEditor(typeof(PunTeams))]
 	public class PunTeamsInspector : Editor {
@@ -31,7 +34,7 @@ namespace ExitGames.UtilityScripts
 
 			if (PunTeams.PlayersPerTeam!=null)
 			{
-				foreach (KeyValuePair<PunTeams.Team,List<PhotonPlayer>> _pair in PunTeams.PlayersPerTeam)
+				foreach (KeyValuePair<PunTeams.Team,List<Player>> _pair in PunTeams.PlayersPerTeam)
 				{	
 					if (!_Foldouts.ContainsKey(_pair.Key))
 					{
@@ -43,9 +46,9 @@ namespace ExitGames.UtilityScripts
 					if (_Foldouts[_pair.Key])
 					{
 						EditorGUI.indentLevel++;
-						foreach(PhotonPlayer _player in _pair.Value)
+						foreach(Player _player in _pair.Value)
 						{
-							EditorGUILayout.LabelField("",_player.ToString() + (PhotonNetwork.player==_player?" - You -":""));
+							EditorGUILayout.LabelField("",_player.ToString() + (PhotonNetwork.LocalPlayer==_player?" - You -":""));
 						}
 						EditorGUI.indentLevel--;
 					}

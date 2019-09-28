@@ -10,6 +10,7 @@ public class CameraRotate : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UnityEngine.XR.InputTracking.disablePositionalTracking = true;
         ViewTransform.rotation = Camtransform.rotation;
     }
 }

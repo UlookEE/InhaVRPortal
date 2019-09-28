@@ -44,9 +44,10 @@ public class move : MonoBehaviour
         
         for (int i=0; i<force.Count; i++)
         {
-            force[i] = Quaternion.EulerAngles(rb.rotation.x, rb.rotation.y, rb.rotation.z) * force[i] * power[i];
+            force[i] = Quaternion.Euler(rb.rotation.x, rb.rotation.y, rb.rotation.z) * force[i] * power[i];
             rb.AddForceAtPosition(force[i], wing[i]);
         }
+
         rb.velocity = new Vector3(0, 0, 0);
     }
 

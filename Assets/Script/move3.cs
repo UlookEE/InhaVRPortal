@@ -5,11 +5,7 @@ using UnityEngine;
 public class move3 : MonoBehaviour
 {
     // Start is called before the first frame update
-    public float ForwardMovementSpeed = 0.5f;
-    public float SideMovementSpeed = 0.2f;
-    public float VerticalMovementSpeed = 0.1f;
-    public float BigPower = 10f;
-    public float SmallPower = 1f;
+
 
     public Vector3 DPower;
 
@@ -20,11 +16,14 @@ public class move3 : MonoBehaviour
             { "LEFT", KeyCode.A },
             { "RIGHT", KeyCode.D },
             { "UP", KeyCode.Space },
-            { "DOWN", KeyCode.LeftShift }
+            { "DOWN", KeyCode.LeftShift },
+            { "ClockWise",KeyCode.E },
+            { "AntiClockWise", KeyCode.Q }
     };
 
     private Rigidbody rb;
-    private const float SPEED = 5000;
+    public float SPEED = 1000;
+    public float WEIGHT = 0.001f;
     // Start is called before the first frame update
     void Start()
     {
@@ -60,14 +59,14 @@ public class move3 : MonoBehaviour
 
             if (addForce > 1f)
             {
-                addForce -= 0.004f;
-                if (addForce < 1.001f && addForce > 0.999f)
+                addForce -= WEIGHT / 10;
+                if (addForce < (1f + WEIGHT / 5) && addForce > (1f - WEIGHT / 5))
                     addForce = 1;
             }
             else
             {
-                addForce += 0.004f;
-                if (addForce < 1.001f && addForce > 0.999f)
+                addForce += WEIGHT / 10;
+                if (addForce < (1f + WEIGHT / 5) && addForce > (1f - WEIGHT / 5))
                     addForce = 1;
             }
         }
@@ -79,9 +78,9 @@ public class move3 : MonoBehaviour
         if (Input.GetKey(this.movementKeyBindings["FORWARD"]))
         {
             var angle = rb.transform.localRotation.eulerAngles.x;
-            if (angle < 30 || angle > 180)
+            if (angle < 60 || angle > 180)
             {
-                forceToDrone(new List<float> { force * 0.95f, force * 0.95f, force * 1.05f, force * 1.05f });
+                forceToDrone(new List<float> { force * (1f - WEIGHT), force * (1f - WEIGHT), force * (1f + WEIGHT), force * (1f + WEIGHT) });
                 adjustAddforce();
             }
             else
@@ -95,7 +94,7 @@ public class move3 : MonoBehaviour
             var angle = rb.transform.localRotation.eulerAngles.x;
             if (angle > 330 || angle < 90)
             {
-                forceToDrone(new List<float> { 1.05f * force, 1.05f * force, force * 0.95f, force * 0.95f });
+                forceToDrone(new List<float> { (1f + WEIGHT) * force, (1f + WEIGHT) * force, force * (1f - WEIGHT), force * (1f - WEIGHT) });
                 adjustAddforce();
             }
             else
@@ -110,7 +109,7 @@ public class move3 : MonoBehaviour
             var angle = rb.transform.localRotation.eulerAngles.z;
             if (angle < 30 || angle > 180)
             {
-                forceToDrone(new List<float> { force * 0.95f, 1.05f * force, force * 0.95f, force * 1.05f });
+                forceToDrone(new List<float> { force * (1f - WEIGHT), (1f + WEIGHT) * force, force * (1f - WEIGHT), force * (1f + WEIGHT) });
                 adjustAddforce();
             }
             else
@@ -125,7 +124,7 @@ public class move3 : MonoBehaviour
             var angle = rb.transform.localRotation.eulerAngles.z;
             if (angle > 330 || angle < 90)
             {
-                forceToDrone(new List<float> { force * 1.05f, 0.95f * force, force * 1.05f, force * 0.95f });
+                forceToDrone(new List<float> { force * (1f + WEIGHT), (1f - WEIGHT) * force, force * (1f + WEIGHT), force * (1f - WEIGHT) });
                 adjustAddforce();
             }
             else
@@ -137,17 +136,29 @@ public class move3 : MonoBehaviour
 
         else if (Input.GetKey(this.movementKeyBindings["UP"]))
         {
-            if (addForce < 1.2f)
-                addForce += 0.004f;
+            if (addForce < 1f + WEIGHT * 300)
+                addForce += WEIGHT / 3;
             forceToDrone(new List<float> { force, force, force, force });
         }
 
         else if (Input.GetKey(this.movementKeyBindings["DOWN"]))
         {
 
-            if (addForce > 0.8f)
-                addForce -= 0.004f;
+            if (addForce > 1f - WEIGHT * 300)
+                addForce -= WEIGHT / 3;
             forceToDrone(new List<float> { force, force, force, force });
+        }
+        else if (Input.GetKey(this.movementKeyBindings["ClockWise"]))
+        {
+            rb.transform.Rotate(rb.transform.up);
+            forceToDrone(new List<float> { force, force, force, force });
+            adjustAddforce();
+        }
+        else if (Input.GetKey(this.movementKeyBindings["AntiClockWise"]))
+        {
+            rb.transform.Rotate(-rb.transform.up);
+            forceToDrone(new List<float> { force, force, force, force });
+            adjustAddforce();
         }
         else
         {

@@ -1,0 +1,101 @@
+---------------------------------------------------
+SUIMONO - INTERACTIVE WATER SYSTEM for UNITY
+
+Copyright ©2019 Tanuki Digital
+Version 2.1.7
+---------------------------------------------------
+
+
+----------------------------
+THANK YOU FOR YOUR PURCHASE!
+----------------------------
+Thank you for supporting SUIMONO!
+It's people like you that allow us to build and improve our software! 
+if you have any questions, comments, or requests for new features
+please visit the Tanuki Digital Forums and post your feedback:
+
+http://tanukidigital.com/forum/
+
+
+
+----------------------
+REGISTER YOUR PURCHASE
+----------------------
+Did you purchase Suimono - Interactive Water System on the Unity Asset Store?
+Registering at Tanuki Digital.com gives you immediate access to new downloads, updates, and exclusive content as well as Suimono and Tanuki Digital news and info.  Fill out the registration forum using your Asset Store "OR" Order Number here:
+
+http://www.tanukidigital.com/suimono/index.php?register=1
+
+
+----------------------
+DOCUMENTATION
+----------------------
+Please read the Suimono 2.0 documentation files for more in-depth customization information.
+http://tanukidigital.com/suimono/documentation
+
+
+-------------
+INSTALLATION
+-------------
+
+I. IMPORT SUIMONO BASE FILES INTO YOUR PROJECT
+
+Go to: "Assets -> Import Package -> Custom Package..." in the Unity Menu. Then select the
+"Suimono_watersystem_v2.x.unitypackage" file.  This will open an import dialog box.
+Click the import button and all the Suimono files will be imported into your project list.
+
+A Note about Demo Content... The Suimono installer file contains a large number of files for the advanced demo scene.  If you don’t need this scene in your project, you can disable importing the demo content by unchecking the SUIMONO - WATER SYSTEM 2/_DEMO folder in the import dialog window before importing.
+
+
+II. ADD THE SUIMONO PREFABS TO YOUR SCENE
+
+1) Drag the SUIMONO_Module prefab (located in the "/PREFABS" folder) into your scene.
+2) Drag the SUIMONO_Surface prefab (located in the "/PREFABS" folder) into your scene.
+3) Add your main scene camera to the 'scene camera object' slot on the module.
+4) (NEW!) Add your main scene directional light to the 'scene light object' slot on the module.
+5) (NEW!) Go to your scene camera object and (if necessary) add the Underwater component by going to Component-->Image Effects-->Suimono-->UnderwaterFX
+
+
+That's it for the basic installation!  You can now position “SUIMONO_Surface” anywhere in your scene that you like, and even rename the “Suimono_Surface” object to anything you wish. This object can also be scaled to fit your scene, but please see the scale note below!
+More in depth installation and setup instructions, as well as a helpful FAQ can be found in the full documentation PDF, available here: http://tanukidigital.com/suimono/documentation
+
+A NOTE ABOUT UPGRADES:
+It's recommended to delete your current Suimono scene objects, the suimono effect on your camera, and then completely delete the Suimono folder in the Project list, and delete any suimono specific game layers before installing this update.
+
+
+
+----------------------------
+CUSTOMIZATION NOTES
+----------------------------
+DEFINING YOUR SCENE CAMERA:
+Suimono tracks a scene camera in order to determine when to initiate the underwater switch. By default Suimono will track the scene camera object that has it’s object tag set to “MainCamera”. However, you can customize which camera Suimono tracks (under the module configuration tab) by changing the 'Camera Mode' to 'Manual Select Camera' and then adding your camera to the 'Scene Camera Object'”' attribute before running your scene.  If you're game is designed around a 3rd person controller, you'll want to designate your character object as the "Scene Track Object"... otherwise for most first-person games, the scene track object would be the same as the scene camera object.  If the scene track object is left vacant it Suimono will automatically set it to the scene camera object specified above.
+
+
+
+-----------------------------
+RELEASE NOTES - Version 2.1.7
+-----------------------------
+WHAT'S NEW:
+- Added slider to control strength of transition fx. (Module General Settings)
+
+CHANGES:
+- Increased maximum underwater fog distance from 100 to 500.
+
+BUG FIXES:
+- Fixed Unity 2018.3+ bug regarding prefab disconnection error message.
+- Fixed bug with Preset UI expanding off of screen.
+- Fixed possible nullRef error in object editor UI.
+- Increased maximum depth testing from 5,000 to 30,000.
+- Unchecking Set Automatic Layers now prevents automatic physics layer overrides.
+- Fixed unintended name conflict in DistanceBlur shader.
+- Fixed bug that force rendered caustics onto underwater surface.
+- Fixed bug preventing foam from respecting surface specular settings.
+- Fixed some rare SuimonoObjects and SuimonoModule null reference errors.
+- Fixed issue preventing proper water transparency when caustics are disabled.
+
+
+
+----------------------------
+CREDITS
+----------------------------
+The Trees, Rocks, and Crate objects included in the advanced demo scene have been adapted from Public Domain assets, created by Nobiax.  Check out his amazing work on the Unity Asset Store!

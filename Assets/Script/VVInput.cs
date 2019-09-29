@@ -8,7 +8,7 @@ public class VVInput : MonoBehaviour
 {
     public SteamVR_ActionSet m_ActionSet;
 
-    public SteamVR_Action_Boolean m_BooleanAction;
+    //public SteamVR_Action_Vector2 m_BooleanAction;
     public SteamVR_Action_Single squeezeAction;
     public SteamVR_Action_Vector2 touchPadAction;
 
@@ -17,7 +17,7 @@ public class VVInput : MonoBehaviour
 
     private void Awake()
     {
-        m_BooleanAction = SteamVR_Actions._default.GrabPinch;
+        //m_BooleanAction = SteamVR_Actions._default.TouchPadTouch;
     }
 
     private void Start()
@@ -27,15 +27,11 @@ public class VVInput : MonoBehaviour
 
     void Update()
     {
-        if(m_BooleanAction.GetState(SteamVR_Input_Sources.Any))
-        {
-
-        }
-        
-        if(SteamVR_Actions._default.Teleport.GetStateUp(SteamVR_Input_Sources.Any))
-        {
-            print("Teleport up");
-        }
+        //Vector2 k = SteamVR_Actions.default_TouchPadTouch.GetAxis(SteamVR_Input_Sources.Any);
+        //if(k != Vector2.zero)
+        //{
+        //    print("Teleport up");
+        //}
 
         if (SteamVR_Actions.default_GrabPinch.GetStateUp(SteamVR_Input_Sources.Any))
         {

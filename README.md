@@ -4,11 +4,11 @@
 
 **2019 Inha Hackathon 대상 수상작 :1st_place_medal:**
 
-<img src="https://github.com/UlookEE/InhaVRPortal/blob/master/readme/3.png?raw=true" alt="drawing" width="300px"
-             height="200px"/>
+<img src="https://github.com/UlookEE/InhaVRPortal/blob/master/readme/3.png?raw=true" alt="drawing" width="100%"
+             height="400px"/>
 
-<img src="https://github.com/UlookEE/InhaVRPortal/blob/master/readme/1.png?raw=true" alt="drawing" width="300px"
-             height="200px"/>
+<img src="https://github.com/UlookEE/InhaVRPortal/blob/master/readme/1.png?raw=true" alt="drawing" width="100%"
+             height="400px"/>
 
 InhaVRPortal은 인하대학교와 그 주변을 배경으로 한 가상현실 속에서 드론을 띄워 조종하는 시뮬레이터입니다.
 
@@ -38,13 +38,13 @@ InhaVRPortal은 이러한 점에 착안하여,
 
 ### 2.1.1. 보행자 및 자동차의 경로 탐색 구현
 
-![peds n cars](https://github.com/UlookEE/InhaVRPortal/blob/master/readme/its.png?raw=true =250x)
+![peds n cars](https://github.com/UlookEE/InhaVRPortal/blob/master/readme/its.png?raw=true)
 
 현실감 있는 환경 조성을 위하여 맵상을 지나다니는 보행자와 자동차를 모델링하고 해당 개체들이 인공지능에 따라 움직일 수 있도록 에셋을 활용하여 경로 탐색을 구현했습니다.
 
 ### 2.1.2. 맵 구현
 
-![terrain](https://github.com/UlookEE/InhaVRPortal/blob/master/readme/terrain.png?raw=true =250x)
+![terrain](https://github.com/UlookEE/InhaVRPortal/blob/master/readme/terrain.png?raw=true)
 
 실제 인하대학교와 비슷한 맵을 구현하기 위해, Unity의 에셋들을 활용하여 다음과 같은 작업들을 수행했습니다. 단, 모델링의 경우 외부 프로그램을 사용하여 직접 제작하거나 타 모델 공유 사이트에서 수집하였습니다.
 * 실제 인하대학교 주변의 지형 데이터를 추출 후 높이맵(heightmap)으로 변환
